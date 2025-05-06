@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weird Animal Generator 🦓🐘🐒</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Reset */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Theme Variables - Default Theme (Playful Bright) */
+        :root {
+            --bg-color: #f0f9ff; /* Light Sky Blue */
+            --text-color: #0c4a6e; /* Dark Cyan */
+            --primary-color: #38bdf8; /* Sky Blue 500 */
+            --secondary-color: #fbbf24; /* Amber 400 */
+            --accent-color: #ec4899; /* Pink 500 */
+            --container-bg: #ffffff;
+            --border-color: #e0f2fe; /* Light Sky Blue variant */
+            --button-bg: var(--primary-color);
+            --button-text: white;
+            --button-hover-bg: #0ea5e9; /* Sky Blue 600 */
+            --shadow-color: rgba(56, 189, 248, 0.3);
+            --twin-line-offset: 4px;
+            --twin-line-color: var(--text-color);
+            --success-color: #22c55e; /* Green 500 */
+            --error-color: #ef4444; /* Red 500 */
+        }
+
+        /* Theme 2: Dark Mode 🌙 */
+        .theme-dark {
+            --bg-color: #1f2937; --text-color: #f3f4f6; --primary-color: #60a5fa; --secondary-color: #facc15; --accent-color: #f472b6; --container-bg: #374151; --border-color: #4b5563; --button-hover-bg: #3b82f6; --shadow-color: rgba(96, 165, 250, 0.3); --twin-line-color: var(--text-color);
+            --success-color: #4ade80; --error-color: #f87171;
+        }
+        /* Theme 3: Sunset Glow 🌅 */
+        .theme-sunset {
+            --bg-color: #fff7ed; --text-color: #7c2d12; --primary-color: #f97316; --secondary-color: #ec4899; --accent-color: #8b5cf6; --container-bg: #ffedd5; --border-color: #fed7aa; --button-hover-bg: #ea580c; --shadow-color: rgba(249, 115, 22, 0.3); --twin-line-color: var(--text-color);
+            --success-color: #84cc16; --error-color: #f97316;
+        }
+        /* Theme 4: Forest Whisper 🌲 */
+        .theme-forest {
+            --bg-color: #f0fdf4; --text-color: #14532d; --primary-color: #22c55e; --secondary-color: #a3e635; --accent-color: #f59e0b; --container-bg: #dcfce7; --border-color: #bbf7d0; --button-hover-bg: #16a34a; --shadow-color: rgba(34, 197, 94, 0.3); --twin-line-color: var(--text-color);
+            --success-color: #16a34a; --error-color: #dc2626;
+        }
+        /* Theme 5: Ocean Deep 🌊 */
+        .theme-ocean {
+            --bg-color: #eff6ff; --text-color: #1e3a8a; --primary-color: #3b82f6; --secondary-color: #10b981; --accent-color: #6366f1; --container-bg: #dbeafe; --border-color: #bfdbfe; --button-hover-bg: #2563eb; --shadow-color: rgba(59, 130, 246, 0.3); --twin-line-color: var(--text-color);
+            --success-color: #10b981; --error-color: #f43f5e;
+        }
+        /* Theme 6: Candy Pop 🍭 */
+        .theme-candy {
+            --bg-color: #fdf2f8; --text-color: #831843; --primary-color: #ec4899; --secondary-color: #a855f7; --accent-color: #22d3ee; --container-bg: #fce7f3; --border-color: #fbcfe8; --button-hover-bg: #db2777; --shadow-color: rgba(236, 72, 153, 0.3); --twin-line-color: var(--text-color);
+            --success-color: #a855f7; --error-color: #e11d48;
+        }
+        /* Theme 7: Retro Arcade 👾 */
+        .theme-arcade {
+            --bg-color: #1a1a2e; --text-color: #00ff00; --primary-color: #ff00ff; --secondary-color: #ffff00; --accent-color: #00ffff; --container-bg: #2a2a3e; --border-color: #4a4a5e; --button-text: #1a1a2e; --button-hover-bg: #e000e0; --shadow-color: rgba(255, 0, 255, 0.4); --twin-line-color: var(--text-color);
+            --success-color: #00ff00; --error-color: #ff3333;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            padding-top: 5rem; 
+            box-sizing: border-box;
+        }
+
+        .theme-selector-container {
+            position: fixed; top: 1rem; right: 1rem; background-color: var(--container-bg); padding: 0.5rem; border-radius: 10px; box-shadow: 0 6px 12px var(--shadow-color); border: 2px solid var(--border-color); z-index: 1000; width: auto; max-width: 200px;
+        }
+        .theme-selector-container::before, .theme-selector-container::after { content: ''; position: absolute; border-radius: 10px; border: 1px solid var(--twin-line-color); transition: all 0.3s ease-in-out; z-index: -1; }
+        .theme-selector-container::before { top: calc(-0.5 * var(--twin-line-offset)); left: calc(-0.5 * var(--twin-line-offset)); right: calc(-0.5 * var(--twin-line-offset)); bottom: calc(-0.5 * var(--twin-line-offset)); opacity: 0.5; }
+        .theme-selector-container::after { top: calc(-1 * var(--twin-line-offset)); left: calc(-1 * var(--twin-line-offset)); right: calc(-1 * var(--twin-line-offset)); bottom: calc(-1 * var(--twin-line-offset)); opacity: 0.25; }
+        .theme-selector { padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--primary-color); background-color: var(--bg-color); color: var(--text-color); font-weight: 500; cursor: pointer; transition: background-color 0.3s ease, border-color 0.3s ease; width: 100%; font-size: 0.9rem; }
+        .theme-selector:focus { outline: none; box-shadow: 0 0 0 2px var(--primary-color); }
+
+        .game-container {
+            background-color: var(--container-bg); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px var(--shadow-color); width: 90%; max-width: 800px; text-align: center; border: 2px solid var(--border-color); margin-top: 1rem; position: relative; animation: fadeInScaleUp 0.8s ease-out forwards;
+        }
+        .game-container::before, .game-container::after { content: ''; position: absolute; border-radius: 16px; border: 2px solid var(--twin-line-color); transition: all 0.3s ease-in-out; }
+        .game-container::before { top: calc(-1 * var(--twin-line-offset)); left: calc(-1 * var(--twin-line-offset)); right: calc(-1 * var(--twin-line-offset)); bottom: calc(-1 * var(--twin-line-offset)); z-index: -1; opacity: 0.6; }
+        .game-container::after { top: calc(-2 * var(--twin-line-offset)); left: calc(-2 * var(--twin-line-offset)); right: calc(-2 * var(--twin-line-offset)); bottom: calc(-2 * var(--twin-line-offset)); z-index: -2; opacity: 0.3; }
+
+        @keyframes fadeInScaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .game-title { font-size: 2.2rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem; padding-top: 1rem; animation: slideInDown 0.6s ease-out forwards; }
+        @keyframes slideInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Game Specific Styles */
+        .game-content { margin-top: 1rem; min-height: 150px; padding: 1rem; color: var(--text-color); font-size: 1.1rem; line-height: 1.6; }
+        #animalDescription { margin-bottom: 1.5rem; padding: 1rem; border: 2px dashed var(--secondary-color); border-radius: 8px; background-color: var(--bg-color); min-height: 80px; display: flex; align-items: center; justify-content: center; text-align: left;}
+        #animalDescription p { margin: 0; }
+        #quizQuestion { font-weight: 600; margin-bottom: 1rem; font-size: 1.25rem; color: var(--primary-color); }
+        #answerOptions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .answer-button {
+            background-color: var(--button-bg); color: var(--button-text); padding: 0.75rem 1rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px var(--shadow-color); position: relative; border: 2px solid transparent;
+        }
+        .answer-button::before { content: ''; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border: 2px solid var(--accent-color); border-radius: 10px; opacity: 0; transition: opacity 0.3s ease; z-index: -1; }
+        .answer-button:hover::before { opacity: 1; }
+        .answer-button:hover { background-color: var(--button-hover-bg); transform: translateY(-3px) scale(1.03); box-shadow: 0 6px 12px var(--shadow-color); }
+        .answer-button:active { transform: translateY(-1px) scale(1.01); }
+        .answer-button.correct { background-color: var(--success-color) !important; color: white !important; }
+        .answer-button.incorrect { background-color: var(--error-color) !important; color: white !important; }
+
+        #feedbackMessage { min-height: 30px; margin-bottom: 1rem; font-weight: 600; font-size: 1.1rem; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        #scoreDisplay { font-size: 1.2rem; font-weight: bold; color: var(--accent-color); margin-top: 1rem; }
+
+        .game-controls button {
+            background-color: var(--button-bg); color: var(--button-text); padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; margin: 0.5rem; box-shadow: 0 4px 6px var(--shadow-color); position: relative; border: 2px solid transparent;
+        }
+        .game-controls button::before { content: ''; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border: 2px solid var(--accent-color); border-radius: 10px; opacity: 0; transition: opacity 0.3s ease; z-index: -1; }
+        .game-controls button:hover::before { opacity: 1; }
+        .game-controls button:hover { background-color: var(--button-hover-bg); transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 12px var(--shadow-color); }
+        .game-controls button:active { transform: translateY(-1px) scale(1.02); }
+
+
+        .footer { margin-top: auto; padding: 1.5rem 1rem; text-align: center; font-size: 0.9rem; color: var(--text-color); width: 100%; background-color: var(--container-bg); border-top: 2px solid var(--border-color); box-shadow: 0 -4px 10px var(--shadow-color); opacity: 0.8; transition: opacity 0.3s ease; }
+        .footer:hover{ opacity: 1; }
+
+        @media (max-width: 768px) {
+            .game-title { font-size: 1.8rem; }
+            .game-container { width: 95%; padding: 1.5rem; margin-top: 1rem; }
+            .theme-selector { font-size: 0.85rem; }
+            #answerOptions { grid-template-columns: 1fr; } /* Stack answers on smaller screens */
+        }
+        @media (max-width: 480px) {
+            body { padding-top: 4.5rem; }
+            .theme-selector-container { padding: 0.4rem; }
+            .theme-selector { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+            .game-title { font-size: 1.6rem; }
+            .game-controls button { padding: 0.6rem 1.2rem; font-size: 0.9rem; width: calc(100% - 1rem); }
+            .game-container { padding: 1rem; }
+            .footer { font-size: 0.8rem; }
+            #animalDescription { font-size: 1rem; }
+            #quizQuestion { font-size: 1.1rem; }
+            .answer-button { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="theme-selector-container">
+        <select id="themeSwitcher" class="theme-selector" aria-label="Select Theme">
+            <option value="default">Default Bright</option>
+            <option value="theme-dark">Dark Mode 🌙</option>
+            <option value="theme-sunset">Sunset Glow 🌅</option>
+            <option value="theme-forest">Forest Whisper 🌲</option>
+            <option value="theme-ocean">Ocean Deep 🌊</option>
+            <option value="theme-candy">Candy Pop 🍭</option>
+            <option value="theme-arcade">Retro Arcade 👾</option>
+        </select>
+    </div>
+
+    <div class="game-container">
+        <h1 class="game-title">Weird Animal Generator 🤪</h1>
+        
+        <div class="game-content">
+            <div id="animalDescription">
+                <p>Welcome! Click "Start Game" to discover a weird new animal! 🤔</p>
+            </div>
+            <div id="quizSection" style="display: none;">
+                <div id="quizQuestion">What is this bizarre creature called?</div>
+                <div id="answerOptions">
+                    </div>
+            </div>
+            <div id="feedbackMessage"></div>
+            <div id="scoreDisplay">Score: 0</div>
+        </div>
+
+        <div class="game-controls" style="margin-top: 1.5rem;">
+            <button id="startButton" class="game-button">Start Game ✨</button>
+            <button id="nextButton" class="game-button" style="display: none;">Next Animal ➡️</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2025 ToolForge. All rights reserved. Built with ❤️ by Anas.
+    </footer>
+
+    <script>
+        // Theme Switcher Logic (from template)
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        const bodyEl = document.body; 
+        const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+        bodyEl.className = savedTheme !== 'default' ? savedTheme : '';
+        themeSwitcher.value = savedTheme;
+        themeSwitcher.addEventListener('change', function() {
+            bodyEl.className = '';
+            if (this.value !== 'default') { bodyEl.classList.add(this.value); }
+            localStorage.setItem('selectedTheme', this.value);
+        });
+
+        // Expanded Animal data
+        const animals = [
+            "Lion", "Tiger", "Elephant", "Zebra", "Monkey", "Penguin", "Kangaroo", "Giraffe", "Crocodile", "Owl", 
+            "Fox", "Wolf", "Bear", "Shark", "Dolphin", "Eagle", "Parrot", "Snake", "Turtle", "Frog", 
+            "Bat", "Spider", "Bee", "Butterfly", "Octopus", "Sloth", "Rabbit", "Horse", "Cow", "Pig",
+            "Chicken", "Duck", "Goat", "Sheep", "Deer", "Rhinoceros", "Hippopotamus", "Panda", "Koala", "Cheetah",
+            "Leopard", "Jaguar", "Hyena", "Badger", "Otter", "Beaver", "Raccoon", "Skunk", "Armadillo", "Platypus",
+            "Hedgehog", "Squirrel", "Chipmunk", "Camel", "Llama", "Alpaca", "Moose", "Reindeer", "Bison", "Yak",
+            "Gorilla", "Orangutan", "Chimpanzee", "Baboon", "Lemur", "Meerkat", "Wombat", "Tasmanian Devil", "Emu", "Ostrich",
+            "Peacock", "Swan", "Pelican", "Flamingo", "Hummingbird", "Woodpecker", "Falcon", "Hawk", "Vulture", "Cobra",
+            "Python", "Anaconda", "Iguana", "Chameleon", "Gecko", "Newt", "Salamander", "Toad", "Axolotl", "Piranha",
+            "Anglerfish", "Swordfish", "Tuna", "Salmon", "Clownfish", "Seahorse", "Starfish", "Jellyfish", "Crab", "Lobster",
+            "Shrimp", "Squid", "Snail", "Slug", "Ant", "Grasshopper", "Ladybug", "Dragonfly", "Mosquito", "Fly",
+            "Moth", "Beetle", "Caterpillar", "Worm", "Centipede", "Millipede", "Scorpion", "Tarantula"
+        ]; // Over 100 animals now!
+
+        const parts = {
+            head: [
+                "a Lion's mane", "Elephant tusks", "an Owl's keen eyes", "a Parrot's colorful beak", "Frog's bulging eyes", 
+                "Antlers like a Deer", "a Fox's pointy ears", "a Shark's toothy grin", "a Rabbit's long ears", "a Horse's noble face",
+                "a Panda's round head", "a Koala's fluffy ears", "a Moose's massive antlers", "a Chameleon's swiveling eyes",
+                "an Anglerfish's bioluminescent lure", "a Hammerhead Shark's distinct head", "a Toucan's oversized bill", "a Cobra's hooded head",
+                "a Fly's compound eyes", "a Snail's stalked eyes"
+            ],
+            body: [
+                "a Tiger's stripes", "a Zebra's pattern", "a Turtle's hard shell", "Penguin's sleek feathers", "a Bear's shaggy fur",
+                "a Snake's scaly coils", "an Octopus's boneless body", "Butterfly wings", "a Cheetah's spotted coat", "a Giraffe's long neck",
+                "a Pufferfish's inflatable body", "a Peacock's iridescent plumage", "a Caterpillar's segmented body", "a Bee's fuzzy thorax",
+                "a Starfish's radial symmetry", "a Hedgehog's spiny back", "a Skunk's striped fur", "an Armadillo's armored plates"
+            ],
+            legs: [
+                "Kangaroo's powerful hind legs", "Monkey's agile limbs", "Spider's eight legs", "Eagle's sharp talons", 
+                "Sloth's slow-moving claws", "Frog's webbed feet", "Giraffe's long stilt-like legs", "a Crab's sideways-scuttling legs",
+                "a Millipede's numerous tiny legs", "a Grasshopper's jumping legs", "a Duck's webbed feet for paddling",
+                "a Cheetah's swift running legs", "an Ostrich's powerful running legs", "a Gecko's sticky toe pads",
+                "a Praying Mantis's raptorial forelegs"
+            ],
+            tail: [
+                "a Fox's bushy tail", "a Crocodile's scaly tail", "a Monkey's prehensile tail", "a Scorpion's stinging tail",
+                "a Beaver's flat tail", "a Peacock's magnificent train", "a Squirrel's fluffy balancing tail", "a Lemur's ringed tail",
+                "a Skunk's warning-striped tail", "a Seahorse's curly tail", "a Newt's regenerative tail", "an Iguana's whip-like tail",
+                "a Kangaroo's strong supportive tail", "a Whale's powerful flukes"
+            ],
+            sound: [
+                "roars like a Lion", "trumpets like an Elephant", "hoots like an Owl", "chatters like a Monkey", "hisses like a Snake",
+                "buzzes like a Bee", "barks like a Dog", "meows like a Cat", "moos like a Cow", "oinks like a Pig",
+                "chirps like a Cricket", "croaks like a Frog", "squeaks like a Mouse", "howls like a Wolf", "bleats like a Goat",
+                "clucks like a Chicken", "screeches like a Hawk", "purrs like a Cheetah", "clicks like a Dolphin", "ribbits like a Frog"
+            ],
+            adjective: [
+                "Mysterious", "Playful", "Ferocious", "Gentle", "Swift", "Nocturnal", "Aquatic", "Flying", "Majestic", "Tiny",
+                "Clumsy", "Wise", "Cunning", "Colorful", "Camouflaged", "Venomous", "Herbivorous", "Carnivorous", "Omnivorous", "Solitary",
+                "Social", "Migratory", "Luminescent", "Armored", "Silent", "Vocal", "Ancient", "Mythical-looking", "Surprisingly agile", "Deep-sea dwelling"
+            ]
+        };
+
+        // Game elements
+        const animalDescriptionEl = document.getElementById('animalDescription').querySelector('p');
+        const quizSectionEl = document.getElementById('quizSection');
+        const quizQuestionEl = document.getElementById('quizQuestion');
+        const answerOptionsEl = document.getElementById('answerOptions');
+        const feedbackMessageEl = document.getElementById('feedbackMessage');
+        const scoreDisplayEl = document.getElementById('scoreDisplay');
+        const startButton = document.getElementById('startButton');
+        const nextButton = document.getElementById('nextButton');
+
+        let currentWeirdAnimal = {};
+        let score = 0;
+        let questionsAnswered = 0;
+
+        function getRandomElement(arr) {
+            if (!arr || arr.length === 0) {
+                return "a mysterious feature"; // Fallback for empty arrays
+            }
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateWeirdAnimalName(baseAnimalsInput) {
+            let name = "";
+            // Ensure baseAnimalsInput is an array and has elements
+            const baseAnimals = Array.isArray(baseAnimalsInput) && baseAnimalsInput.length > 0 ? baseAnimalsInput : ["Mystic", "Creature"];
+
+            const numAnimalsToCombine = Math.random() < 0.6 ? 2 : (baseAnimals.length >= 3 ? 3 : baseAnimals.length);
+            let chosenAnimals = [];
+            
+            // Ensure we don't try to pick more animals than available or from an empty list
+            let availableAnimals = [...baseAnimals];
+            for(let i=0; i < numAnimalsToCombine && availableAnimals.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * availableAnimals.length);
+                chosenAnimals.push(availableAnimals.splice(randomIndex, 1)[0]);
+            }
+            
+            chosenAnimals = [...new Set(chosenAnimals)]; 
+
+            if (chosenAnimals.length === 0) { // Fallback if no animals were chosen (should not happen with current logic)
+                name = "Oddity";
+            } else if (chosenAnimals.length === 1) { 
+                 name = getRandomElement(["Mega", "Robo", "Super", "Chrono", "Astro"]) + chosenAnimals[0];
+            } else if (chosenAnimals.length === 2) {
+                const firstHalf = chosenAnimals[0].substring(0, Math.ceil(chosenAnimals[0].length / 2));
+                const secondHalf = chosenAnimals[1].substring(Math.floor(chosenAnimals[1].length / 2));
+                name = firstHalf + secondHalf;
+            } else { // 3 animals
+                const part1 = chosenAnimals[0].substring(0, Math.floor(chosenAnimals[0].length / 3) +1);
+                const part2 = chosenAnimals[1].substring(Math.floor(chosenAnimals[1].length / 3), Math.floor(chosenAnimals[1].length * 2/3)+1);
+                const part3 = chosenAnimals[2].substring(Math.floor(chosenAnimals[2].length * 2/3));
+                name = part1 + part2 + part3;
+            }
+            return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+        }
+        
+        function generateAnimal() {
+            const baseAnimal1 = getRandomElement(animals);
+            const baseAnimal2 = getRandomElement(animals.filter(a => a !== baseAnimal1)); 
+            const baseAnimal3 = getRandomElement(animals.filter(a => a !== baseAnimal1 && a !== baseAnimal2));
+
+            const chosenHead = getRandomElement(parts.head);
+            const chosenBody = getRandomElement(parts.body);
+            const chosenLegs = getRandomElement(parts.legs);
+            const chosenTail = getRandomElement(parts.tail);
+            const chosenSound = getRandomElement(parts.sound);
+            const chosenAdjective = getRandomElement(parts.adjective);
+
+            const description = `Behold the ${chosenAdjective} creature! It has ${chosenHead}, ${chosenBody}, and ${chosenLegs}. You might recognize its ${chosenTail}. Approach with caution, as it ${chosenSound}! 🧐`;
+            
+            const name = generateWeirdAnimalName([baseAnimal1, baseAnimal2, baseAnimal3].filter(Boolean)); // Filter out undefined if animals array is small
+
+            currentWeirdAnimal = {
+                name: name,
+                description: description,
+            };
+            return currentWeirdAnimal;
+        }
+
+        function displayQuiz() {
+            const animal = generateAnimal();
+            animalDescriptionEl.textContent = animal.description;
+            feedbackMessageEl.textContent = "";
+            feedbackMessageEl.style.color = ""; 
+            quizSectionEl.style.display = "block";
+            answerOptionsEl.innerHTML = ""; 
+
+            const options = [animal.name];
+            while (options.length < 4) {
+                const distractorBase1 = getRandomElement(animals);
+                const distractorBase2 = getRandomElement(animals.filter(a => a !== distractorBase1));
+                const distractorName = generateWeirdAnimalName([distractorBase1, distractorBase2].filter(Boolean));
+                if (!options.includes(distractorName) && distractorName !== animal.name) { // Ensure distractor is unique and not the answer
+                    options.push(distractorName);
+                }
+            }
+
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+
+            options.forEach(opt => {
+                const button = document.createElement('button');
+                button.classList.add('answer-button');
+                button.textContent = opt;
+                button.addEventListener('click', () => checkAnswer(opt, button));
+                answerOptionsEl.appendChild(button);
+            });
+
+            startButton.style.display = "none";
+            nextButton.style.display = "inline-block";
+            nextButton.disabled = true; 
+        }
+
+        function checkAnswer(selectedName, buttonEl) {
+            const buttons = answerOptionsEl.querySelectorAll('.answer-button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedName === currentWeirdAnimal.name) {
+                feedbackMessageEl.textContent = "Correct! 🎉 You're an animal expert!";
+                feedbackMessageEl.style.color = "var(--success-color)";
+                buttonEl.classList.add('correct');
+                score++;
+            } else {
+                feedbackMessageEl.textContent = `Oops! Not quite. The correct name was ${currentWeirdAnimal.name}. 😢`;
+                feedbackMessageEl.style.color = "var(--error-color)";
+                buttonEl.classList.add('incorrect');
+                buttons.forEach(btn => {
+                    if (btn.textContent === currentWeirdAnimal.name) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            questionsAnswered++;
+            scoreDisplayEl.textContent = `Score: ${score} / ${questionsAnswered}`;
+            nextButton.disabled = false; 
+        }
+
+        startButton.addEventListener('click', () => {
+            score = 0;
+            questionsAnswered = 0;
+            scoreDisplayEl.textContent = `Score: 0`;
+            animalDescriptionEl.innerHTML = `<p>Generating your first weird animal... 🧬</p>`;
+            setTimeout(displayQuiz, 500); 
+        });
+        
+        nextButton.addEventListener('click', () => {
+             animalDescriptionEl.innerHTML = `<p>Summoning another bizarre beast... ✨</p>`;
+             quizSectionEl.style.display = "none"; 
+             feedbackMessageEl.textContent = ""; 
+             setTimeout(displayQuiz, 500);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameButtons = document.querySelectorAll('.game-controls button');
+            gameButtons.forEach((button, index) => {
+                button.style.animation = `fadeInScaleUp 0.5s ease-out ${index * 0.1 + 0.5}s forwards`;
+                button.style.opacity = 0; 
+            });
+        });
+
+    </script>
+</body>
+</html>
